@@ -1,7 +1,8 @@
 package Resources;
 
-import Domain.dtos.PassengerDTO;
-import Services.PassengerService;
+
+import Domain.dtos.TravelDTO;
+import Services.TravelService;
 import io.smallrye.common.annotation.NonBlocking;
 import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
@@ -12,14 +13,14 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
 import org.jboss.resteasy.reactive.RestResponse;
 
-@Path("/passenger")
-public class PassengerResource {
+@Path("/travel")
+public class TravelResource {
 
-    private final PassengerService passengerService;
+    private final TravelService travelService;
 
     @Inject
-    PassengerResource(PassengerService passengerService) {
-        this.passengerService = passengerService;
+    public TravelResource(TravelService travelService) {
+        this.travelService = travelService;
     }
 
     @POST
@@ -27,21 +28,19 @@ public class PassengerResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    public Uni<RestResponse<Void>> create(PassengerDTO passengerDTO, @Context UriInfo uri) {
-        return this.passengerService.create(passengerDTO)
-                .replaceWith(RestResponse.created(uri.getAbsolutePath()));
+    public Uni<RestResponse<Void>> create(TravelDTO travelDTO, @Context UriInfo uriInfo) {
+        return travelService.create(travelDTO)
+                .replaceWith(RestResponse.created(uriInfo.getAbsolutePath()));
     }
 
-    @Path("{id}")
     @GET
+    @Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Uni<RestResponse<PassengerDTO>> getById(Long id) {
-        return this.passengerService
-                .getById(id)
+    public Uni<RestResponse<TravelDTO>> getById(Long id) {
+        return travelService.findById(id)
                 .onItem()
                 .transform(RestResponse::ok);
-
     }
 
 
