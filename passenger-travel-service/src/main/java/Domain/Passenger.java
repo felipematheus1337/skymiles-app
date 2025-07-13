@@ -2,6 +2,7 @@ package Domain;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,8 @@ public class Passenger {
     private String name;
 
     private String email;
+
+    private BigDecimal miles = BigDecimal.ZERO;
 
     @ManyToMany
     @JoinTable(
@@ -67,5 +70,13 @@ public class Passenger {
 
     public void setTravels(List<Travel> travels) {
         this.travels = travels;
+    }
+
+    public BigDecimal getMiles() {
+        return miles;
+    }
+
+    public void setMiles(BigDecimal miles) {
+        this.miles = miles;
     }
 }

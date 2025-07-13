@@ -1,4 +1,6 @@
 package Domain.dtos;
 
-public record PassengerDTO(String name, String email) {
+import java.math.BigDecimal;
+
+public record PassengerDTO(String name, String email, BigDecimal miles) {
 }

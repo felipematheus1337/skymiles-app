@@ -4,6 +4,7 @@ import Domain.enums.TravelStatus;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,6 +18,9 @@ public class Travel {
     private LocalDateTime date;
 
     private TravelStatus status;
+
+    private BigDecimal basePrice = BigDecimal.ZERO;
+    private BigDecimal finalPrice = BigDecimal.ZERO;
 
     @ManyToMany(mappedBy = "travels")
     private List<Passenger> passengers;
@@ -70,5 +74,21 @@ public class Travel {
 
     public void setPassengers(List<Passenger> passengers) {
         this.passengers = passengers;
+    }
+
+    public BigDecimal getBasePrice() {
+        return basePrice;
+    }
+
+    public void setBasePrice(BigDecimal basePrice) {
+        this.basePrice = basePrice;
+    }
+
+    public BigDecimal getFinalPrice() {
+        return finalPrice;
+    }
+
+    public void setFinalPrice(BigDecimal finalPrice) {
+        this.finalPrice = finalPrice;
     }
 }

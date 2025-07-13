@@ -6,6 +6,7 @@ import Domain.enums.TravelStatus;
 import Exceptions.ResourceNotFoundException;
 import Mapper.TravelMapper;
 import Repositories.TravelRepository;
+import io.quarkus.hibernate.reactive.panache.common.WithSession;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -33,6 +34,7 @@ public class TravelService {
         return travelRepository.persist(entity);
     }
 
+    @WithSession
     public Uni<TravelDTO> findById(Long id) {
         return this.travelRepository.findById(id)
                 .onItem()

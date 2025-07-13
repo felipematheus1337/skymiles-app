@@ -36,7 +36,7 @@ public class PassengerService {
                 .ifNull()
                 .failWith(new ResourceNotFoundException(Passenger.class.getName() + "Not Found"))
                 .onItem()
-                .transform(item -> this.passengerMapper.toDTO(item));
+                .transform(this.passengerMapper::toDTO);
 
     }
 }
