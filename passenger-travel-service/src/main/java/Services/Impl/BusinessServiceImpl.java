@@ -2,6 +2,7 @@ package Services.Impl;
 
 import Domain.Passenger;
 import Domain.dtos.PassengerDTO;
+import Domain.dtos.TravelDTO;
 import Exceptions.ResourceNotFoundException;
 import Mapper.PassengerMapper;
 import Repositories.PassengerRepository;
@@ -10,9 +11,11 @@ import Services.BusinessService;
 import Services.PassengerService;
 import Services.TravelService;
 import io.quarkus.hibernate.reactive.panache.common.WithSession;
+import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import patterns.TravelBusinessFacade;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -24,27 +27,30 @@ public class BusinessServiceImpl implements BusinessService  {
     private final TravelService travelService;
     private final PassengerService passengerService;
     private final PassengerMapper passengerMapper;
+    private final TravelBusinessFacade travelBusinessFacade;
 
     @Inject
-    public BusinessServiceImpl(TravelService travelService, PassengerService passengerService, PassengerMapper passengerMapper) {
+    public BusinessServiceImpl(TravelService travelService, PassengerService passengerService, PassengerMapper passengerMapper, TravelBusinessFacade travelBusinessFacade) {
         this.travelService = travelService;
         this.passengerService = passengerService;
         this.passengerMapper = passengerMapper;
+        this.travelBusinessFacade = travelBusinessFacade;
     }
 
     @Override
-    @WithSession
-    public Uni<Void> addPassengerToTravel(Long id) {
+    @WithTransaction
+    public Uni<Void> addPassengerToTravel(Long id, Long travelId) {
         try {
+            Uni<TravelDTO> uniTravel = this.travelService.findById(travelId);
             Uni<PassengerDTO> passengerDTO = this.passengerService.getById(id);
-            var passengerEntity = passengerDTO
+            var uniPassenger = passengerDTO
                     .onItem()
                     .ifNull()
                     .failWith(new ResourceNotFoundException("Passenger not found to add"))
                     .onItem()
-                    .transformToUni(this::verifyPassenger)
-                    .onItem()
                     .transform(this.passengerMapper::toEntity);
+
+            return this.travelBusinessFacade.add(uniTravel, passengerDTO);
 
 
         } catch (RuntimeException ex) {
@@ -53,29 +59,5 @@ public class BusinessServiceImpl implements BusinessService  {
        return Uni.createFrom().nullItem().replaceWithVoid();
     }
 
-    private Uni<PassengerDTO> verifyPassenger(PassengerDTO item) {
-        int comparableInteger = item.miles().compareTo(BigDecimal.ZERO);
-        BigDecimal newMiles = BigDecimal.valueOf(50L);
 
-        if (comparableInteger > 0) {
-            // calling future API..
-        }
-
-       return Uni.createFrom().item(new PassengerDTO(item.name(), item.email(), newMiles));
-    }
-
-
-    @Override
-    public Uni<Void> addPassengersInLote(List<Long> ids) {
-       List<Uni<PassengerDTO>> unis = ids.stream()
-               .map(passengerService::getById)
-               .map(uni -> uni.flatMap(this::verifyPassenger))
-               .toList();
-
-       return Uni.combine().all()
-               .unis(unis)
-               .with(passengers -> {
-                   return null;
-               });
-    }
 }

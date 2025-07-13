@@ -12,6 +12,7 @@ import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @ApplicationScoped
@@ -42,5 +43,19 @@ public class TravelService {
                 .failWith(new ResourceNotFoundException(Travel.class.getName() + "Not found"))
                 .onItem()
                 .transform(this.travelMapper::toDTO);
+    }
+
+    @WithTransaction
+    public Uni<Void> updateTravelStatusAndFinalPrice(Long id, TravelStatus status, BigDecimal finalPrice) {
+        return this.travelRepository
+                .findById(id)
+                .onItem()
+                .transform(item ->  {
+                    item.setStatus(status);
+                    item.setFinalPrice(finalPrice);
+                    return item;
+                })
+                .flatMap(travelRepository::persist)
+                .replaceWithVoid();
     }
 }

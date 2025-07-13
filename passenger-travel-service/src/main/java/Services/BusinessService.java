@@ -10,8 +10,7 @@ import java.util.concurrent.CompletionStage;
 @ApplicationScoped
 public interface BusinessService {
 
-    Uni<Void> addPassengerToTravel(Long id);
+    Uni<Void> addPassengerToTravel(Long passengerId, Long travelId);
 
-    Uni<Void> addPassengersInLote(List<Long> id);
 
 }

@@ -1,6 +1,7 @@
 package Domain.dtos;
 
-import java.math.BigDecimal;
 
-public record PassengerDTO(String name, String email, BigDecimal miles) {
+import jakarta.annotation.Nullable;
+
+public record PassengerDTO(@Nullable Long id, String name, String email) {
 }
